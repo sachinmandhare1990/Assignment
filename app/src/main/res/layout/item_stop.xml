@@ -28,13 +28,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
+                android:textColor="@color/black"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_stop_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#666666"
+                android:textColor="@color/black"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -42,6 +43,7 @@
             android:id="@+id/tv_stop_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
     </LinearLayout>
