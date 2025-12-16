@@ -60,6 +60,18 @@ Used the internet for
 * generation of readme file 
 * Copied the required code from my previous applications.
 
+## Zoom Logic
+
+The `StopsViewModel` has the following logic in `updateVisibleStops()`:
+
+* **Zoom >= 15 (Street Level):**
+* Filters stops that are strictly within the visible map bounds.
+* **Zoom >= 12 and <=15 (City Level):**
+* Filters stops within a 5km radius of the camera target and caps the list at 100 items sorted by distance from the map center.
+* **Zoom < 12 (Region Level):**
+* Calculates distance from the map center to all stops.
+* Sorts by distance and picks the top 30 closest stops to avoid clutter.
+
 ## 👤 Author
 
 **Sachin Mandhare**
