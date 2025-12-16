@@ -33,9 +33,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ActivityMainBinding binding;
 
+    private final Map<String, Marker> stopMarkers = new HashMap<>();
+    private String selectedStopId = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +71,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         binding.rvStops.setLayoutManager(new LinearLayoutManager(this));
         stopsAdapter = new StopsAdapter(stopUiModel -> {
+            selectedStopId = stopUiModel.stop.getId();
             if (googleMap != null) {
                 if (stopUiModel.stop.getLat() != null && stopUiModel.stop.getLng() != null) {
                     LatLng pos = new LatLng(stopUiModel.stop.getLat(), stopUiModel.stop.getLng());
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16));
+
+                    // show info window
+                    Marker marker = stopMarkers.get(stopUiModel.stop.getId());
+                    if (marker != null) {
+                        marker.showInfoWindow();
+                    }
                 }
             }
         });
@@ -115,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (googleMap == null) return;
 
         googleMap.clear();
+        stopMarkers.clear();
+
         for (StopUiModel model : stops) {
             if (model.stop.getLat() != null && model.stop.getLng() != null) {
                 LatLng pos = new LatLng(model.stop.getLat(), model.stop.getLng());
@@ -127,7 +142,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 }
-                googleMap.addMarker(markerOptions);
+                Marker marker = googleMap.addMarker(markerOptions);
+                if (marker != null) {
+                    marker.setTag(model.stop.getId());
+                    stopMarkers.put(model.stop.getId(), marker);
+                }
+            }
+        }
+
+        if (selectedStopId != null) {
+            Marker marker = stopMarkers.get(selectedStopId);
+            if (marker != null) {
+                marker.showInfoWindow();
             }
         }
     }
@@ -152,10 +178,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.googleMap = googleMap;
         googleMap.setOnCameraIdleListener(this);
 
+        googleMap.setOnMarkerClickListener(marker -> {
+            String stopId = (String) marker.getTag();
+            selectedStopId = stopId;
+            if (stopId != null) {
+                scrollToStop(stopId);
+            }
+            return false;
+        });
+
+        googleMap.setOnMapClickListener(latLng -> selectedStopId = null);
+
         LatLng delhi = new LatLng(28.6139, 77.2090);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(delhi,12));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(delhi, 12));
 
         checkLocationPermission();
+
+    }
+
+    private void scrollToStop(String stopId) {
+        List<StopUiModel> stops = stopsViewModel.getVisibleStops().getValue();
+        if (stops != null) {
+            for (int i = 0; i < stops.size(); i++) {
+                if (stops.get(i).stop.getId().equals(stopId)) {
+                    binding.rvStops.smoothScrollToPosition(i);
+                    break;
+                }
+            }
+        }
 
     }
 
