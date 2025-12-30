@@ -72,6 +72,14 @@ The `StopsViewModel` has the following logic in `updateVisibleStops()`:
 * Calculates distance from the map center to all stops.
 * Sorts by distance and picks the top 30 closest stops to avoid clutter.
 
+## Branching
+**Master**
+* It will have the first [assignment1](https://docs.google.com/document/d/10xd9fyEQZyUAnOQ6VfCyrlpHkWJKW1DFoyIAycBvVTw/edit?usp=sharing)
+
+**Assignment2**
+* It will have the second [assignment2](https://docs.google.com/document/d/10T92UuepQyL1mtngtN4L-ARp4FfAP6_0JIBJ5_7aDeA/edit?usp=sharing)
+
+
 ## 👤 Author
 
 **Sachin Mandhare**
